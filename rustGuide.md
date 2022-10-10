@@ -23,3 +23,4 @@ $ cargo generate --git https://github.com/Rahix/avr-hal-template.git
 ```
 
 - You can use the `new-project.sh` script to make a new project
+- The project can be run with `cargo run`
