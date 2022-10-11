@@ -28,9 +28,12 @@ fn main() -> ! {
     uwriteln!(&mut serial, "Welcome to the cum zone");
     
     loop {
-        let line = nb::block!(serial.read()).unwrap();
-        if line == 0{
+        let line = nb::block!(serial.read()).unwrap() as char;
+        uwriteln!(&mut serial, "{}",line);
+        /*if line == 'd'{
             led.toggle();
-        }
+            uwriteln!(&mut serial, "Led Toggled");
+            
+        }*/
     }
 }
