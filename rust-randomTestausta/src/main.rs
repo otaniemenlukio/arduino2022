@@ -5,7 +5,6 @@ use panic_halt as _;
 use ufmt::*;
 use embedded_hal::serial::Read;
 
-
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -21,19 +20,18 @@ fn main() -> ! {
      * examples available.
      */
 
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let mut serial = arduino_hal::default_serial!(dp, pins, 100000);
 
     let mut led = pins.d13.into_output();
-    
+    let mut serialList:[char; 32]=Default::default();
     uwriteln!(&mut serial, "Welcome to the cum zone");
-    
     loop {
-        let line = nb::block!(serial.read()).unwrap() as char;
-        uwriteln!(&mut serial, "{}",line);
-        /*if line == 'd'{
-            led.toggle();
-            uwriteln!(&mut serial, "Led Toggled");
-            
-        }*/
+        readSerial(serial);
+        
     }
+}
+
+fn readSerial(&mut serial:Usart<Atmega, USART0, Pin<Input, PD0>, Pin<Output, PD1>, MHz16>
+){
+    let l = nb::block!(serial.read()).unwrap() as char;
 }
