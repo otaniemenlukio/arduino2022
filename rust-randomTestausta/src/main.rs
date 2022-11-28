@@ -1,37 +1,37 @@
 #![no_std]
 #![no_main]
+#![allow(non_snake_case)]
 
 use panic_halt as _;
 use ufmt::*;
 use embedded_hal::serial::Read;
+use arduino_hal::Pins; 
+use arduino_hal::usart::*;
 
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-
-    /*
-     * For examples (and inspiration), head to
-     *
-     *     https://github.com/Rahix/avr-hal/tree/main/examples
-     *
-     * NOTE: Not all examples were ported to all boards!  There is a good chance though, that code
-     * for a different board can be adapted for yours.  The Arduino Uno currently has the most
-     * examples available.
-     */
+    let pins = arduino_hal::pins!(dp);    
 
     let mut serial = arduino_hal::default_serial!(dp, pins, 100000);
-
-    let mut led = pins.d13.into_output();
-    let mut serialList:[char; 32]=Default::default();
+    let mut serialList :[u8;50] = [0;50];
     uwriteln!(&mut serial, "Welcome to the cum zone");
+    let mut serialCount :usize =0;
     loop {
-        readSerial(serial);
+        let l = nb::block!(serial.read()).unwrap();
+        match l{
+            0=>{
+                serialCount=0;
+                let print: &str = core::str::from_utf8(&serialList).unwrap();
+                uwriteln!(&mut serial,"Data: {}", print);
+            },
+            _ => {
+                serialList[serialCount]=l;
+                serialCount+=1;
+            }
+        }
+
         
     }
 }
 
-fn readSerial(&mut serial:Usart<Atmega, USART0, Pin<Input, PD0>, Pin<Output, PD1>, MHz16>
-){
-    let l = nb::block!(serial.read()).unwrap() as char;
-}
